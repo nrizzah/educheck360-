@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDUCHECK360</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal active">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2 id="authTitle">Welcome to EDUCHECK360</h2>
+                <div class="role-toggle">
+                    <button type="button" class="role-btn active" id="studentRoleBtn" onclick="selectRole('student')">
+                        👨‍🎓 Student
+                    </button>
+                    <button type="button" class="role-btn" id="adminRoleBtn" onclick="selectRole('admin')">
+                        👨‍💼 Admin
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="btn btn-primary auth-btn">Login as <span id="loginRoleText">Student</span></button>
+                    <p class="auth-switch">
+                        Don't have an account? 
+                        <a href="#" onclick="showSignupForm()">Sign up here</a>
+                    </p>
+                    
+                    
+                </form>
+
+                <!-- Signup Form -->
+                <form id="signupForm" class="auth-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" required placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" required placeholder="Create a password" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" required placeholder="Confirm your password">
+                    </div>
+                    <button type="submit" class="btn btn-primary auth-btn">Sign Up as <span id="signupRoleText">Student</span></button>
+                    <p class="auth-switch">
+                        Already have an account? 
+                        <a href="#" onclick="showLoginForm()">Login here</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">📚</div>
+                    <div class="logo-text">
+                        <h1>EDUCHECK360</h1>
+                        <p id="headerSubtitle">Student Task Manager</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <span id="userWelcome" class="user-welcome"></span>
+                    
+                    <!-- Student Actions -->
+                    <div id="studentActions" class="header-actions-group">
+                        <button class="btn btn-secondary" id="notificationBtn" title="Notification Settings">
+                            <span class="btn-icon">🔔</span>
+                            Settings
+                        </button>
+                        <button class="btn btn-primary" id="createChecklistBtn">
+                            <span class="btn-icon">+</span>
+                            New Checklist
+                        </button>
+                    </div>
+                    
+                    <!-- Admin Actions -->
+                    <div id="adminActions" class="header-actions-group" style="display: none;">
+                        <button class="btn btn-info" id="manageUsersBtn" title="Manage Users">
+                            <span class="btn-icon">👥</span>
+                            Users
+                        </button>
+                    </div>
+                    
+                    <button class="btn btn-secondary" id="logoutBtn">
+                        <span class="btn-icon">🚪</span>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Student Dashboard -->
+    <main id="studentDashboard" class="main">
+        <div class="container">
+            <!-- Daily Quote Section -->
+            <section class="quote-section">
+                <div class="quote-card">
+                    <div class="quote-icon">💡</div>
+                    <div class="quote-content">
+                        <p id="dailyQuote" class="quote-text"></p>
+                        <p id="quoteAuthor" class="quote-author"></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stats Section -->
+            <section class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-info">
+                            <h3 id="totalChecklists">0</h3>
+                            <p>Total Checklists</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <h3 id="completedTasks">0</h3>
+                            <p>Completed Tasks</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏰</div>
+                        <div class="stat-info">
+                            <h3 id="pendingTasks">0</h3>
+                            <p>Pending Tasks</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <h3 id="completionRate">0%</h3>
+                            <p>Completion Rate</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🚨</div>
+                        <div class="stat-info">
+                            <h3 id="dueSoonTasks">0</h3>
+                            <p>Due Soon</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filters -->
+            <section class="filters-section">
+                <div class="filters">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Search checklists...">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    <select id="subjectFilter" class="filter-select">
+                        <option value="">All Subjects</option>
+                        <option value="Mathematics">📊 Mathematics</option>
+                        <option value="Science">🔬 Science</option>
+                        <option value="English">📚 English</option>
+                        <option value="History">🏛️ History</option>
+                        <option value="Art">🎨 Art</option>
+                        <option value="Physical Education">⚽ Physical Education</option>
+                        <option value="Music">🎵 Music</option>
+                        <option value="Computer Science">💻 Computer Science</option>
+                        <option value="General">📋 General</option>
+                    </select>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="completed">Completed</option>
+                        <option value="incomplete">Incomplete</option>
+                        <option value="overdue">Overdue</option>
+                        <option value="due-soon">Due Soon</option>
+                    </select>
+                    <select id="priorityFilter" class="filter-select">
+                        <option value="">All Priorities</option>
+                        <option value="high">High Priority</option>
+                        <option value="medium">Medium Priority</option>
+                        <option value="low">Low Priority</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Checklists Grid -->
+            <section class="checklists-section">
+                <div id="checklistsGrid" class="checklists-grid">
+                    <!-- Checklists will be dynamically inserted here -->
+                </div>
+                
+                <!-- Empty State -->
+                <div id="emptyState" class="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <h3>No checklists yet</h3>
+                    <p>Create your first checklist to start organizing your tasks!</p>
+                    <button class="btn btn-primary" onclick="showCreateModal()">
+                        <span class="btn-icon">+</span>
+                        Create First Checklist
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Admin Dashboard -->
+    <main id="adminDashboard" class="main" style="display: none;">
+        <div class="container">
+            <!-- Admin Stats Section -->
+            <section class="admin-stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card admin-stat">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <h3 id="totalUsers">0</h3>
+                            <p>Total Users</p>
+                        </div>
+                    </div>
+                    <div class="stat-card admin-stat">
+                        <div class="stat-icon">🟢</div>
+                        <div class="stat-info">
+                            <h3 id="activeUsers">0</h3>
+                            <p>Active Users</p>
+                        </div>
+                    </div>
+                    <div class="stat-card admin-stat">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-info">
+                            <h3 id="totalChecklistsAdmin">0</h3>
+                            <p>Total Checklists</p>
+                        </div>
+                    </div>
+                    <div class="stat-card admin-stat">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <h3 id="totalTasksAdmin">0</h3>
+                            <p>Total Tasks</p>
+                        </div>
+                    </div>
+                    <div class="stat-card admin-stat">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <h3 id="systemCompletionRate">0%</h3>
+                            <p>System Completion Rate</p>
+                        </div>
+                    </div>
+                    <div class="stat-card admin-stat">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-info">
+                            <h3 id="newUsersThisWeek">0</h3>
+                            <p>New Users This Week</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Controls -->
+            <section class="admin-controls-section">
+                <div class="admin-tabs">
+                    <button class="admin-tab active" data-tab="users" onclick="switchAdminTab('users')">
+                        👥 User Management
+                    </button>
+                </div>
+
+                <!-- User Management Tab -->
+                <div id="usersTab" class="admin-tab-content active">
+                    <div class="admin-section-header">
+                        <h3>User Management</h3>
+                        <button class="btn btn-primary" onclick="showCreateUserModal()">
+                            <span class="btn-icon">+</span>
+                            Add User
+                        </button>
+                    </div>
+                    <div class="users-table-container">
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Role</th>
+                                    <th>Email</th>
+                                    <th>Joined</th>
+                                    <th>Last Login</th>
+                                    <th>Checklists</th>
+                                    <th>Tasks Completed</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Users will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Analytics Tab -->
+                <div id="analyticsTab" class="admin-tab-content">
+                    <div class="admin-section-header">
+                        <h3>System Analytics</h3>
+                    </div>
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <h4>User Activity Trends</h4>
+                            <div id="userActivityChart" class="chart-placeholder">
+                                📈 User activity visualization would go here
+                            </div>
+                        </div>
+                        <div class="analytics-card">
+                            <h4>Task Completion Rates</h4>
+                            <div id="completionRateChart" class="chart-placeholder">
+                                📊 Completion rate visualization would go here
+                            </div>
+                        </div>
+                        <div class="analytics-card">
+                            <h4>Subject Distribution</h4>
+                            <div id="subjectDistributionChart" class="chart-placeholder">
+                                🎯 Subject distribution visualization would go here
+                            </div>
+                        </div>
+                        <div class="analytics-card">
+                            <h4>System Performance</h4>
+                            <div id="performanceMetrics" class="metrics-list">
+                                <!-- Performance metrics will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Create User Modal (Admin) -->
+    <div id="createUserModal" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Create New User</h2>
+                <button class="modal-close" onclick="closeCreateUserModal()">&times;</button>
+            </div>
+            <form id="createUserForm" class="modal-body">
+                <div class="form-group">
+                    <label for="newUserName">Full Name</label>
+                    <input type="text" id="newUserName" required placeholder="Enter full name">
+                </div>
+                <div class="form-group">
+                    <label for="newUserEmail">Email</label>
+                    <input type="email" id="newUserEmail" required placeholder="Enter email address">
+                </div>
+                <div class="form-group">
+                    <label for="newUserRole">Role</label>
+                    <select id="newUserRole" required>
+                        <option value="student">Student</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="newUserPassword">Password</label>
+                    <input type="password" id="newUserPassword" required placeholder="Create password" minlength="6">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeCreateUserModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create/Edit Checklist Modal -->
+    <div id="checklistModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Create New Checklist</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="checklistForm" class="modal-body">
+                <div class="form-group">
+                    <label for="checklistTitle">Title</label>
+                    <input type="text" id="checklistTitle" required placeholder="e.g., Math Homework">
+                </div>
+                <div class="form-group">
+                    <label for="checklistDescription">Description (optional)</label>
+                    <textarea id="checklistDescription" placeholder="Brief description of this checklist..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="checklistSubject">Subject</label>
+                        <select id="checklistSubject" required>
+                            <option value="">Select a subject</option>
+                            <option value="Mathematics">📊 Mathematics</option>
+                            <option value="Science">🔬 Science</option>
+                            <option value="English">📚 English</option>
+                            <option value="History">🏛️ History</option>
+                            <option value="Art">🎨 Art</option>
+                            <option value="Physical Education">⚽ Physical Education</option>
+                            <option value="Music">🎵 Music</option>
+                            <option value="Computer Science">💻 Computer Science</option>
+                            <option value="General">📋 General</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="checklistPriority">Priority</label>
+                        <select id="checklistPriority" required>
+                            <option value="low">🟢 Low</option>
+                            <option value="medium" selected>🟡 Medium</option>
+                            <option value="high">🔴 High</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="checklistDueDate">Due Date (optional)</label>
+                        <input type="datetime-local" id="checklistDueDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="reminderTime">Reminder</label>
+                        <select id="reminderTime">
+                            <option value="">No reminder</option>
+                            <option value="15">15 minutes before</option>
+                            <option value="60">1 hour before</option>
+                            <option value="1440">1 day before</option>
+                            <option value="2880">2 days before</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Initial Tasks</label>
+                    <div id="tasksList" class="tasks-list">
+                        <div class="task-input-group">
+                            <input type="text" placeholder="Enter a task..." class="task-input">
+                            <button type="button" class="btn-remove-task" onclick="removeTaskInput(this)">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-add-task" onclick="addTaskInput()">
+                        <span class="btn-icon">+</span>
+                        Add Task
+                    </button>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span id="submitBtnText">Create Checklist</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Add New Task</h2>
+                <button class="modal-close" onclick="closeTaskModal()">&times;</button>
+            </div>
+            <form id="taskForm" class="modal-body">
+                <div class="form-group">
+                    <label for="taskText">Task</label>
+                    <input type="text" id="taskText" required placeholder="Enter task description...">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskPriority">Priority</label>
+                        <select id="taskPriority">
+                            <option value="low">🟢 Low</option>
+                            <option value="medium" selected>🟡 Medium</option>
+                            <option value="high">🔴 High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDueDate">Due Date</label>
+                        <input type="datetime-local" id="taskDueDate">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeTaskModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Settings Modal -->
+    <div id="notificationModal" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Notification Settings</h2>
+                <button class="modal-close" onclick="closeNotificationModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="toggle-group">
+                        <label for="enableNotifications">Enable Browser Notifications</label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="enableNotifications">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="toggle-group">
+                        <label for="enableReminders">Enable Task Reminders</label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="enableReminders">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="toggle-group">
+                        <label for="enableDailyQuotes">Enable Daily Quotes</label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="enableDailyQuotes" checked>
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="reminderSound">Reminder Sound</label>
+                    <select id="reminderSound">
+                        <option value="default">Default</option>
+                        <option value="bell">Bell</option>
+                        <option value="chime">Chime</option>
+                        <option value="silent">Silent</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeNotificationModal()">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveNotificationSettings()">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Download Task Report</h2>
+                <button class="modal-close" onclick="closeReportModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="report-preview">
+                    <h3>Report Preview</h3>
+                    <div id="reportStats" class="report-stats"></div>
+                </div>
+                <div class="form-group">
+                    <label>Report Format</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="reportFormat" value="csv" checked>
+                            <span class="radio-custom"></span>
+                            CSV (Excel Compatible)
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="reportFormat" value="txt">
+                            <span class="radio-custom"></span>
+                            Text Format
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="reportFormat" value="json">
+                            <span class="radio-custom"></span>
+                            JSON Data
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Include</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="includeCompleted" checked>
+                            <span class="checkbox-custom"></span>
+                            Completed Tasks
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="includePending" checked>
+                            <span class="checkbox-custom"></span>
+                            Pending Tasks
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="includeOverdue" checked>
+                            <span class="checkbox-custom"></span>
+                            Overdue Tasks
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="includeStats" checked>
+                            <span class="checkbox-custom"></span>
+                            Statistics Summary
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
